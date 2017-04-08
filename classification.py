@@ -15,8 +15,8 @@ class Classification:
         self.documents={}
         self.sum_doucuments=0
         self.start_index=10
-        self.train_index=1000
-        self.max_index=1200
+        self.train_index=1500
+        self.max_index=1600
         with open("stopwords.txt") as file:
             self.stopwords=file.read().strip().split()
         self.useless=['，','。',' ','”','“','！','、','？','【','】','：',',','.','[',']','?','-','；','(',')','&nbsp;','（','）',':','"','《','》','<','>','%','$','&','nbsp',';','％','－','···']
@@ -94,9 +94,18 @@ class Classification:
 
 
 
+    def ReadDataFromFile(self,name):
+        try:
+            with open(name) as file:
+                self.TF_IDF=json.load(file)
+            with open('documents.json') as file:
+                self.documents=json.load(file)
+            with open('sum.txt') as file:
+                self.sum_doucuments=int(file.read())
+            return True
+        except:
+            return False
 
-    def WhichClass(self,t):
-        pass
     def test(self):
         t=0
         i=0
@@ -140,6 +149,10 @@ class Classification:
             file.write(json.dumps(self.data))
         with open('tf_idf.json','w') as file:
             file.write(json.dumps(self.TF_IDF))
+        with open('documents.json','w') as file:
+            file.write(json.dumps(self.documents))
+        with open('sum.txt','w') as file:
+            file.write(str(self.sum_doucuments))
         print('write back completed')
 
 
@@ -147,14 +160,25 @@ class Classification:
 
 
 
-
+start=datetime.now()
 a=Classification()
-a.InitializeData()
-a.Train()
-# for x in a.TF:
-#     print(min(a.TF[x].values()))
+print('你想从文件中导入数据吗？y/n')
+sign=input()
+if sign=='y':
+    if a.ReadDataFromFile('tf_idf.json'):
+        print('读取文件成功')
+    else:
+        print('读取文件失败')
+elif sign=='n':
+    a.InitializeData()
+    a.Train()
+    a.SaveData()
+
 [x,y]=a.test()
 print(x)
 print(y)
 print(x/y)
 print('over')
+finish=datetime.now()
+print(start)
+print(finish)
